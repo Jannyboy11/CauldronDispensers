@@ -44,6 +44,7 @@ public class DispenserListener implements Listener {
             } else if (isPowderSnowBucket(dispensedItem)) {
                 event.setCancelled(true);
                 setEmptyBucketInDispenser(dispenser, dispensedItem);
+                adjacentBlock.setType(Material.POWDER_SNOW_CAULDRON);
                 setFullLevel(adjacentBlock);
                 // TODO any sound?
             }
@@ -62,6 +63,7 @@ public class DispenserListener implements Listener {
             } else if (isPowderSnowCauldron(adjacentBlock)) {
                 event.setCancelled(true);
                 setPowderSnowBucketInDispenser(dispenser, dispensedItem);
+                adjacentBlock.setType(Material.CAULDRON);
                 // TODO
             }
         }
