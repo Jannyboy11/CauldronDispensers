@@ -1,0 +1,5 @@
+name: CauldronDispensers
+author: Jannyboy11
+main: com.janboerman.cauldrondispensers.CauldronDispensers
+version: ${project.version}
+api-version: 26.3
