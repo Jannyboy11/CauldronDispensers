@@ -1,6 +1,7 @@
 package com.janboerman.cauldrondispensers;
 
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Levelled;
@@ -8,16 +9,23 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Map;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 public class DispenserListener implements Listener {
+
+    private final CauldronDispensers plugin;
+
+    DispenserListener(CauldronDispensers plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDispense(BlockDispenseEvent event) {
         if (!(event.getBlock().getState() instanceof org.bukkit.block.Dispenser dispenser)) return;
+        // Note: when this event is called, the item is already removed from the Dispenser's Inventory.
 
         Block dispenserBlock = event.getBlock();
         org.bukkit.block.data.type.Dispenser dispenserBlockData = (org.bukkit.block.data.type.Dispenser) dispenserBlock.getBlockData();
@@ -29,86 +37,53 @@ public class DispenserListener implements Listener {
         if (isEmptyCauldron(adjacentBlock)) {
             // check whether we can dispense the bucket contents:
             if (isWaterBucket(dispensedItem)) {
-                event.setCancelled(true);
-                setEmptyBucketInDispenser(dispenser, dispensedItem);
+                addEmptyBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.WATER_CAULDRON);
                 setFullLevel(adjacentBlock);
-                // TODO any sound?
-                // TODO will the dispenser sound still play? does a water / lava sound play when dispensing water/lava normally? do we want an extra (bucket or water) sound here as well?
+                adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_EMPTY, 1F, 1F);
+                markDispensedItemForRemoval(event, dispensedItem);
             } else if (isLavaBucket(dispensedItem)) {
-                event.setCancelled(true);
-                setEmptyBucketInDispenser(dispenser, dispensedItem);
+                addEmptyBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.LAVA_CAULDRON);
                 setFullLevel(adjacentBlock);
-                // TODO any sound?
+                adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_EMPTY_LAVA, 1F, 1F);
+                markDispensedItemForRemoval(event, dispensedItem);
             } else if (isPowderSnowBucket(dispensedItem)) {
-                event.setCancelled(true);
-                setEmptyBucketInDispenser(dispenser, dispensedItem);
+                addEmptyBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.POWDER_SNOW_CAULDRON);
                 setFullLevel(adjacentBlock);
-                // TODO any sound?
+                adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_EMPTY_POWDER_SNOW, 1F, 1F);
+                markDispensedItemForRemoval(event, dispensedItem);
             }
         } else if (isEmptyBucket(dispensedItem)) {
             // check whether we can fill the bucket:
             if (isWaterCauldron(adjacentBlock)) {
-                event.setCancelled(true);
-                setWaterBucketInDispenser(dispenser, dispensedItem);
+                addWaterBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.CAULDRON);
-                // TODO any sound?
+                adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_FILL, 1F, 1F);
+                markDispensedItemForRemoval(event, dispensedItem);
             } else if (isLavaCauldron(adjacentBlock)) {
-                event.setCancelled(true);
-                setLavaBucketInDispenser(dispenser, dispensedItem);
+                addLavaBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.CAULDRON);
-                // TODO any sound?
+                adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_FILL_LAVA, 1F, 1F);
+                markDispensedItemForRemoval(event, dispensedItem);
             } else if (isPowderSnowCauldron(adjacentBlock)) {
-                event.setCancelled(true);
-                setPowderSnowBucketInDispenser(dispenser, dispensedItem);
+                addPowderSnowBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.CAULDRON);
-                // TODO
+                adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_FILL_POWDER_SNOW, 1F, 1F);
+                markDispensedItemForRemoval(event, dispensedItem);
             }
         }
     }
 
-    // logic (generic)
+    //
 
-    private static int findSlotOfItemIgnoringAmount(Inventory inventory, ItemStack item) {
-        ItemStack[] contents = inventory.getContents();
-        for (int i = 0; i < contents.length; i += 1) {
-            if (item.isSimilar(contents[i])) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    // logic (dispensing)
-
-    private static void setEmptyBucketInDispenser(org.bukkit.block.Dispenser dispenser, ItemStack filledBucket) {
-        // Find the index of the filled bucket
-        Inventory dispenserInventory = dispenser.getInventory();
-        int bucketInventorySlot = findSlotOfItemIgnoringAmount(dispenserInventory, filledBucket);
-        ItemStack dispenserBucket = dispenserInventory.getItem(bucketInventorySlot);
-
+    private void addEmptyBucketToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack filledBucket) {
         // Ensure the empty bucket retains metadata (such as custom name, lore, etc) by making a clone of the original
         ItemStack emptyBucketStack = filledBucket.clone();
         emptyBucketStack.setType(Material.BUCKET);
 
-        // Replace the filled bucket by an empty bucket in the dispenser
-        if (dispenserBucket.getAmount() <= filledBucket.getAmount()) {
-            // replace filled bucket
-            dispenserInventory.setItem(bucketInventorySlot, emptyBucketStack);
-        } else {
-            // subtract filledBucket count from filled bucket (should naturally be 1, but may differ)
-            dispenserBucket.setAmount(dispenserBucket.getAmount() - filledBucket.getAmount());
-            dispenserInventory.setItem(bucketInventorySlot, dispenserBucket);
-
-            // add empty bucket, falling back to dropping the empty bucket on the ground
-            Map<Integer, ItemStack> remainder = dispenserInventory.addItem(emptyBucketStack);
-            for (ItemStack remainderItem : remainder.values()) {
-                dispenser.getWorld().dropItemNaturally(dispenser.getLocation().add(0.5, 0.5, 0.5), remainderItem);
-            }
-        }
+        plugin.addItemToDispenser(dispenser, emptyBucketStack);
     }
 
     private static void setFullLevel(Block block) {
@@ -117,44 +92,36 @@ public class DispenserListener implements Listener {
         block.setBlockData(levelled);
     }
 
-    // logic (retracting)
+    //
 
-    private static void setWaterBucketInDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket) {
-        setFilledBucketInDispenser(dispenser, emptyBucket, Material.WATER_BUCKET);
+    private void addWaterBucketToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket) {
+        addFilledBucketToDispenser(dispenser, emptyBucket, Material.WATER_BUCKET);
     }
 
-    private static void setLavaBucketInDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket) {
-        setFilledBucketInDispenser(dispenser, emptyBucket, Material.LAVA_BUCKET);
+    private void addLavaBucketToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket) {
+        addFilledBucketToDispenser(dispenser, emptyBucket, Material.LAVA_BUCKET);
     }
 
-    private static void setPowderSnowBucketInDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket) {
-        setFilledBucketInDispenser(dispenser, emptyBucket, Material.POWDER_SNOW_BUCKET);
+    private void addPowderSnowBucketToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket) {
+        addFilledBucketToDispenser(dispenser, emptyBucket, Material.POWDER_SNOW_BUCKET);
     }
 
-    private static void setFilledBucketInDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket, Material filledBucketMaterial) {
-        // Find the index of the empty bucket
-        Inventory dispenserInventory = dispenser.getInventory();
-        int bucketInventorySlot = findSlotOfItemIgnoringAmount(dispenserInventory, emptyBucket);
-        ItemStack dispenserBucket = dispenserInventory.getItem(bucketInventorySlot);
-
+    private void addFilledBucketToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket, Material filledBucketMaterial) {
+        // Ensure the empty bucket retains metadata (such as custom name, lore, etc) by making a clone of the original
         ItemStack filledBucketStack = emptyBucket.clone();
         filledBucketStack.setType(filledBucketMaterial);
 
-        // Replace the empty bucket by a filled bucket in the dispenser
-        if (dispenserBucket.getAmount() <= emptyBucket.getAmount()) {
-            // replace the empty bucket
-            dispenserInventory.setItem(bucketInventorySlot, filledBucketStack);
-        } else {
-            // subtract emptyBucket count from the empty bucket (should naturally be 1, but may differ)
-            dispenserBucket.setAmount(dispenserBucket.getAmount() - emptyBucket.getAmount());
-            dispenserInventory.setItem(bucketInventorySlot, dispenserBucket);
+        plugin.addItemToDispenser(dispenser, filledBucketStack);
+    }
 
-            // add filled bucket, falling back to dropping the filled bucket on the ground
-            Map<Integer, ItemStack> remainder = dispenser.getInventory().addItem(filledBucketStack);
-            for (ItemStack remainderItem : remainder.values()) {
-                dispenser.getWorld().dropItemNaturally(dispenser.getLocation().add(0.5, 0.5, 0.5), remainderItem);
-            }
-        }
+    //
+
+    private void markDispensedItemForRemoval(BlockDispenseEvent event, ItemStack dispensedItem) {
+        ItemMeta itemMeta = dispensedItem.getItemMeta();
+        PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+        pdc.set(plugin.taggedForRemovalKey, PersistentDataType.BOOLEAN, true);
+        dispensedItem.setItemMeta(itemMeta);
+        event.setItem(dispensedItem);
     }
 
     // utils
@@ -192,9 +159,9 @@ public class DispenserListener implements Listener {
     }
 
     private static boolean isFull(Levelled levelled) {
-        // TODO or should we return levelled.getLevel() == 0?
         return levelled.getLevel() == levelled.getMaximumLevel();
         // The minecraft wiki suggests level 3 means full: https://minecraft.wiki/w/Cauldron#Block_states
+        // (Note that this has nothing to do with levels 1-7 and 8-15 for normal flowing liquids, per Levelled javadocs)
     }
 
 }
