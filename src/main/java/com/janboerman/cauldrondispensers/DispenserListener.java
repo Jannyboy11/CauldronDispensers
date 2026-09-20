@@ -1,5 +1,6 @@
 package com.janboerman.cauldrondispensers;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -13,6 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.Arrays;
+import java.util.Map;
 
 public class DispenserListener implements Listener {
 
@@ -83,7 +87,7 @@ public class DispenserListener implements Listener {
         ItemStack emptyBucketStack = filledBucket.clone();
         emptyBucketStack.setType(Material.BUCKET);
 
-        plugin.addItemToDispenser(dispenser, emptyBucketStack);
+        addItemToDispenser(dispenser, emptyBucketStack);
     }
 
     private static void setFullLevel(Block block) {
@@ -111,7 +115,28 @@ public class DispenserListener implements Listener {
         ItemStack filledBucketStack = emptyBucket.clone();
         filledBucketStack.setType(filledBucketMaterial);
 
-        plugin.addItemToDispenser(dispenser, filledBucketStack);
+        addItemToDispenser(dispenser, filledBucketStack);
+    }
+
+    //
+
+    private void addItemToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack itemStack) {
+        // TODO adding items to the dispenser doesn't seem to work yet..
+        IO.println("DEBUG: adding item to dispenser: " + itemStack);
+
+        Map<Integer, ItemStack> remainder = dispenser.getInventory().addItem(itemStack);
+
+        IO.println(("DEBUG: dispenser contents is now: " + Arrays.toString(dispenser.getInventory().getContents())));
+
+        // couldn't add, or partial add - drop remainders on the ground
+        for (ItemStack remainderItem : remainder.values()) {
+            dropItemInsideBlockLocation(dispenser.getBlock(), remainderItem);
+        }
+    }
+
+    private static void dropItemInsideBlockLocation(Block block, ItemStack itemStack) {
+        Location dropLocation = block.getLocation().add(0.5, 0.5, 0.5);
+        block.getWorld().dropItemNaturally(dropLocation, itemStack);
     }
 
     //
