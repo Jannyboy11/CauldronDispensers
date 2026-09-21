@@ -15,15 +15,4 @@ public class LavaBucketCauldronBehaviour extends FilledBucketCauldronBehaviour {
     protected BlockState getFullCauldronState() {
         return Blocks.LAVA_CAULDRON.defaultBlockState();
     }
-
-    @Override
-    protected boolean isSpecificCauldron(BlockState blockState) {
-        return blockState.is(Blocks.LAVA_CAULDRON);
-    }
-
-    @Override
-    protected BlockState getCauldronState(int level) {
-        // should throw exception, but we put this here just to be future-proof.
-        return Blocks.LAVA_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, level);
-    }
 }

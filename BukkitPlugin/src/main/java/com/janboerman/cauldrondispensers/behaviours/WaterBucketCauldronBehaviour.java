@@ -17,14 +17,4 @@ public class WaterBucketCauldronBehaviour extends FilledBucketCauldronBehaviour 
     protected BlockState getFullCauldronState() {
         return Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, LayeredCauldronBlock.MAX_FILL_LEVEL);
     }
-
-    @Override
-    protected boolean isSpecificCauldron(BlockState blockState) {
-        return blockState.is(Blocks.WATER_CAULDRON);
-    }
-
-    @Override
-    protected BlockState getCauldronState(int level) {
-        return Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, level);
-    }
 }

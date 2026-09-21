@@ -9,9 +9,7 @@ import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.bukkit.Bukkit;
@@ -53,8 +51,7 @@ public abstract class FilledBucketCauldronBehaviour extends DefaultDispenseItemB
             {
                 CraftBlock dispenserCraftBlock = CraftBlock.at(level, blockSource.pos());
                 CraftItemStack craftItemStack = ITEM_UTIL.asCraftMirror(filledBucketItemStack);
-                // Weird velocity, but copied from standard water/lava bucket dispenser behaviour.
-                Vector velocity = new Vector(hopefullyCauldronBlockPos.getX(), hopefullyCauldronBlockPos.getY(), hopefullyCauldronBlockPos.getZ());
+                Vector velocity = new Vector(0, 0, 0);
 
                 BlockDispenseEvent dispenseEvent = new BlockDispenseEvent(dispenserCraftBlock, craftItemStack, velocity);
                 Bukkit.getPluginManager().callEvent(dispenseEvent); // ignore DispenserBlock.eventFired because it doesn't exist on Paper
@@ -67,10 +64,10 @@ public abstract class FilledBucketCauldronBehaviour extends DefaultDispenseItemB
                     // Chain to handler for new item
                     ItemStack eventStack = ITEM_UTIL.asNmsCopy(dispenseEvent.getItem());
                     DispenseItemBehavior dispenseitembehavior = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
-                    if (dispenseitembehavior != DispenseItemBehavior.NOOP && dispenseitembehavior != this) {
+                    if (dispenseitembehavior != this) {
                         dispenseitembehavior.dispense(blockSource, eventStack);
-                        return filledBucketItemStack;
                     }
+                    return filledBucketItemStack;
                 }
             }
 
@@ -78,22 +75,22 @@ public abstract class FilledBucketCauldronBehaviour extends DefaultDispenseItemB
             ItemStack singleEmptyBucket = filledBucketItemStack.transmuteCopy(CauldronDispensers.EMPTY_BUCKET, 1);
             ItemStack resultDispensedItem = consumeWithRemainder(blockSource, filledBucketItemStack, singleEmptyBucket);
 
+
             cauldronLevelChangeEvent:
             {
                 BlockState newState = getFullCauldronState();
-
                 CraftBlock cauldronCraftBlock = CraftBlock.at(level, hopefullyCauldronBlockPos);
                 CraftBlockState craftBlockState = CraftBlockStates.getBlockState(level, hopefullyCauldronBlockPos);
                 craftBlockState.setData(newState);
+
                 CauldronLevelChangeEvent cauldronEvent = new CauldronLevelChangeEvent(cauldronCraftBlock, null, CauldronLevelChangeEvent.ChangeReason.UNKNOWN, craftBlockState);
                 Bukkit.getPluginManager().callEvent(cauldronEvent);
+
                 if (cauldronEvent.isCancelled()) {
                     break cauldronLevelChangeEvent;
                 }
-                int newLevel = cauldronEvent.getNewLevel();
-                if (newState.getBlock() instanceof LayeredCauldronBlock && !Integer.valueOf(newLevel).equals(newState.getValue(LayeredCauldronBlock.LEVEL))) {
-                    newState = getCauldronState(newLevel);
-                }
+
+                newState = craftBlockState.getHandle();
 
                 // Actual cauldron logic:
                 level.setBlockAndUpdate(hopefullyCauldronBlockPos, newState);
@@ -112,8 +109,4 @@ public abstract class FilledBucketCauldronBehaviour extends DefaultDispenseItemB
     }
 
     protected abstract BlockState getFullCauldronState();
-
-    protected abstract boolean isSpecificCauldron(BlockState blockState);
-
-    protected abstract BlockState getCauldronState(int level);
 }

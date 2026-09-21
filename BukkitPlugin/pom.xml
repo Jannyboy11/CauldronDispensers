@@ -13,6 +13,22 @@
 
     <build>
         <finalName>CauldronDispensers</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.2</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>
@@ -28,18 +44,21 @@
             <groupId>com.janboerman.cauldrondispensers</groupId>
             <artifactId>Compat</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.janboerman.cauldrondispensers</groupId>
             <artifactId>CraftBukkitCompat</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.janboerman.cauldrondispensers</groupId>
             <artifactId>PaperCompat</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
