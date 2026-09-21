@@ -1,7 +1,7 @@
 name: CauldronDispensers
 author: Jannyboy11
 main: com.janboerman.cauldrondispensers.CauldronDispensers
-version: '1.0'
+version: ${project.version}
 api-version: 26.3
 
 folia-supported: true
