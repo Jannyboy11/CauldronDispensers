@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Dispenser;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -41,48 +42,74 @@ public class DispenserListener implements Listener {
         if (isEmptyCauldron(adjacentBlock)) {
             // check whether we can dispense the bucket contents:
             if (isWaterBucket(dispensedItem)) {
-                addEmptyBucketToDispenser(dispenser, dispensedItem);
+                event.setCancelled(true);
+//                removeItemFromDispenser(dispenser, dispensedItem);      // TODO seems to work (at least, after one tick).
+//                addEmptyBucketToDispenser(dispenser, dispensedItem);    // TODO seems to not work (at least, after one tick). why not?
+                // TODO remove temporary call:
+                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                    dispenser.getInventory().removeItem(dispensedItem.clone());
+                    dispenser.getInventory().addItem(new ItemStack(Material.BUCKET));
+                    dispenser.update();
+                });
+
                 adjacentBlock.setType(Material.WATER_CAULDRON);
                 setFullLevel(adjacentBlock);
                 adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_EMPTY, 1F, 1F);
-                markDispensedItemForRemoval(event, dispensedItem);
+//                markDispensedItemForRemoval(event, dispensedItem); TODO remove.
             } else if (isLavaBucket(dispensedItem)) {
+                event.setCancelled(true);
+                removeItemFromDispenser(dispenser, dispensedItem);
                 addEmptyBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.LAVA_CAULDRON);
-                setFullLevel(adjacentBlock);
+                // Lava cauldron is not levelled, so there is no setFullLevel call intentionally.
                 adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_EMPTY_LAVA, 1F, 1F);
-                markDispensedItemForRemoval(event, dispensedItem);
+//                markDispensedItemForRemoval(event, dispensedItem); TODO remove.
             } else if (isPowderSnowBucket(dispensedItem)) {
+                event.setCancelled(true);
+                removeItemFromDispenser(dispenser, dispensedItem);
                 addEmptyBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.POWDER_SNOW_CAULDRON);
                 setFullLevel(adjacentBlock);
                 adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_EMPTY_POWDER_SNOW, 1F, 1F);
-                markDispensedItemForRemoval(event, dispensedItem);
+//                markDispensedItemForRemoval(event, dispensedItem); TODO remove.
             }
         } else if (isEmptyBucket(dispensedItem)) {
             // check whether we can fill the bucket:
             if (isWaterCauldron(adjacentBlock)) {
+                event.setCancelled(true);
+                removeItemFromDispenser(dispenser, dispensedItem);
                 addWaterBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.CAULDRON);
                 adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_FILL, 1F, 1F);
-                markDispensedItemForRemoval(event, dispensedItem);
+//                markDispensedItemForRemoval(event, dispensedItem); TODO remove.
             } else if (isLavaCauldron(adjacentBlock)) {
+                event.setCancelled(true);
+                removeItemFromDispenser(dispenser, dispensedItem);
                 addLavaBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.CAULDRON);
                 adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_FILL_LAVA, 1F, 1F);
-                markDispensedItemForRemoval(event, dispensedItem);
+//                markDispensedItemForRemoval(event, dispensedItem); TODO remove.
             } else if (isPowderSnowCauldron(adjacentBlock)) {
+                event.setCancelled(true);
+                removeItemFromDispenser(dispenser, dispensedItem);
                 addPowderSnowBucketToDispenser(dispenser, dispensedItem);
                 adjacentBlock.setType(Material.CAULDRON);
                 adjacentBlock.getWorld().playSound(adjacentBlock.getLocation(), Sound.ITEM_BUCKET_FILL_POWDER_SNOW, 1F, 1F);
-                markDispensedItemForRemoval(event, dispensedItem);
+//                markDispensedItemForRemoval(event, dispensedItem); TODO remove.
             }
         }
     }
 
     //
 
-    private void addEmptyBucketToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack filledBucket) {
+    private void removeItemFromDispenser(Dispenser dispenser, ItemStack dispensedItem) {
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            dispenser.getInventory().removeItem(dispensedItem.clone());
+            dispenser.update();
+        });
+    }
+
+    private void addEmptyBucketToDispenser(Dispenser dispenser, ItemStack filledBucket) {
         // Ensure the empty bucket retains metadata (such as custom name, lore, etc) by making a clone of the original
         ItemStack emptyBucketStack = filledBucket.clone();
         emptyBucketStack.setType(Material.BUCKET);
@@ -98,19 +125,19 @@ public class DispenserListener implements Listener {
 
     //
 
-    private void addWaterBucketToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket) {
+    private void addWaterBucketToDispenser(Dispenser dispenser, ItemStack emptyBucket) {
         addFilledBucketToDispenser(dispenser, emptyBucket, Material.WATER_BUCKET);
     }
 
-    private void addLavaBucketToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket) {
+    private void addLavaBucketToDispenser(Dispenser dispenser, ItemStack emptyBucket) {
         addFilledBucketToDispenser(dispenser, emptyBucket, Material.LAVA_BUCKET);
     }
 
-    private void addPowderSnowBucketToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket) {
+    private void addPowderSnowBucketToDispenser(Dispenser dispenser, ItemStack emptyBucket) {
         addFilledBucketToDispenser(dispenser, emptyBucket, Material.POWDER_SNOW_BUCKET);
     }
 
-    private void addFilledBucketToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack emptyBucket, Material filledBucketMaterial) {
+    private void addFilledBucketToDispenser(Dispenser dispenser, ItemStack emptyBucket, Material filledBucketMaterial) {
         // Ensure the empty bucket retains metadata (such as custom name, lore, etc) by making a clone of the original
         ItemStack filledBucketStack = emptyBucket.clone();
         filledBucketStack.setType(filledBucketMaterial);
@@ -120,18 +147,30 @@ public class DispenserListener implements Listener {
 
     //
 
-    private void addItemToDispenser(org.bukkit.block.Dispenser dispenser, ItemStack itemStack) {
-        // TODO adding items to the dispenser doesn't seem to work yet..
-        IO.println("DEBUG: adding item to dispenser: " + itemStack);
+    private void addItemToDispenser(org.bukkit.block.Dispenser dispenser2, ItemStack itemStack) {
+        // TODO ideally, don't want to put this in a delayed task, but, might not have another choice...
 
-        Map<Integer, ItemStack> remainder = dispenser.getInventory().addItem(itemStack);
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            // TODO adding items to the dispenser doesn't seem to work yet..
+            org.bukkit.block.Dispenser dispenser = (org.bukkit.block.Dispenser) dispenser2.getBlock().getState();
 
-        IO.println(("DEBUG: dispenser contents is now: " + Arrays.toString(dispenser.getInventory().getContents())));
+            IO.println("DEBUG: adding item to dispenser: " + itemStack);
 
-        // couldn't add, or partial add - drop remainders on the ground
-        for (ItemStack remainderItem : remainder.values()) {
-            dropItemInsideBlockLocation(dispenser.getBlock(), remainderItem);
-        }
+            Map<Integer, ItemStack> remainder = dispenser.getInventory().addItem(itemStack);
+
+            IO.println(("DEBUG: dispenser contents is now: " + Arrays.toString(dispenser.getInventory().getContents()))); // <-- prints the correct bucket item, but new bucket's aren't shown!
+
+            dispenser.update(); // make it so the block state is set onto the dispenser block again. TODO check that this works!
+
+            // TODO new check:
+            dispenser = (org.bukkit.block.Dispenser) dispenser.getBlock().getState();
+            IO.println(("DEBUG: dispenser contents is now: " + Arrays.toString(dispenser.getInventory().getContents()))); // <-- DOES NOT PRINT THE CORRECT BUCKET ITEM!
+
+            // couldn't add, or partial add - drop remainders on the ground
+            for (ItemStack remainderItem : remainder.values()) {
+                dropItemInsideBlockLocation(dispenser.getBlock(), remainderItem);
+            }
+        });
     }
 
     private static void dropItemInsideBlockLocation(Block block, ItemStack itemStack) {
@@ -141,6 +180,7 @@ public class DispenserListener implements Listener {
 
     //
 
+    @Deprecated(forRemoval = true)
     private void markDispensedItemForRemoval(BlockDispenseEvent event, ItemStack dispensedItem) {
         ItemMeta itemMeta = dispensedItem.getItemMeta();
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
@@ -176,7 +216,7 @@ public class DispenserListener implements Listener {
     }
 
     private static boolean isLavaCauldron(Block block) {
-        return block.getType() == Material.LAVA_CAULDRON && isFull((Levelled) block.getBlockData());
+        return block.getType() == Material.LAVA_CAULDRON; // No levels for lava_cauldron; it's always full (it were empty, then it's a regular cauldron).
     }
 
     private static boolean isPowderSnowCauldron(Block block) {

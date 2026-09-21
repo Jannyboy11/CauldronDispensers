@@ -1,6 +1,5 @@
 package com.janboerman.cauldrondispensers;
 
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -8,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
+@Deprecated(forRemoval = true) // TODO remove this.
 public class ItemSpawnListener implements Listener {
 
     private final CauldronDispensers plugin;
