@@ -1,13 +1,13 @@
-package com.janboerman.cauldrondispensers.compat.craftbukkit;
+package com.janboerman.cauldrondispensers.compat.paper;
 
 import com.janboerman.cauldrondispensers.compat.ItemUtil;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 
-public class ItemUtilImpl implements ItemUtil {
+public class PaperItemUtil implements ItemUtil {
 
     @Override
-    public org.bukkit.inventory.ItemStack asCraftMirror(net.minecraft.world.item.ItemStack nmsStack) {
-        return CraftItemStack.asCraftMirror(nmsStack);
+    public org.bukkit.craftbukkit.inventory.CraftItemStack asCraftMirror(net.minecraft.world.item.ItemStack nmsStack) {
+        return (CraftItemStack) CraftItemStack.asBukkitMirror(nmsStack);
     }
 
     @Override

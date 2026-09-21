@@ -5,9 +5,6 @@ import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.DispenserBlock;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
@@ -52,4 +49,5 @@ public class CauldronDispensers extends JavaPlugin {
     private static void setDispenseItemBehaviour(Item item, DispenseItemBehavior behaviour) {
         DispenserBlock.registerBehavior(item, behaviour);
     }
+
 }

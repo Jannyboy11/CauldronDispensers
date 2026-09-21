@@ -40,6 +40,8 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         if (adjacentBlockState.is(Blocks.WATER_CAULDRON) && isFull(adjacentBlockState)) {
             // TODO fire BlockDispenseEvent
 
+            // TODO fire CauldronLevelChangeEvent
+
             setEmptyCauldron(level, adjacentBlockPos);
 
             ItemStack singleWaterBucket = emptyBucketItemStack.transmuteCopy(CauldronDispensers.WATER_BUCKET, 1);
@@ -49,6 +51,8 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         else if (adjacentBlockState.is(Blocks.LAVA_CAULDRON) && isFull(adjacentBlockState)) {
             // TODO fire BlockDispenseEvent
 
+            // TODO fire CauldronLevelChangeEvent
+
             setEmptyCauldron(level, adjacentBlockPos);
 
             ItemStack singleLavaBucket = emptyBucketItemStack.transmuteCopy(CauldronDispensers.LAVA_BUCKET, 1);
@@ -57,6 +61,8 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
 
         else if (adjacentBlockState.is(Blocks.POWDER_SNOW_CAULDRON) && isFull(adjacentBlockState)) {
             // TODO fire BlockDispenseEvent
+
+            // TODO fire CauldronLevelChangeEvent
 
             setEmptyCauldron(level, adjacentBlockPos);
 
@@ -69,7 +75,7 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         }
     }
 
-    private static boolean isFull(BlockState cauldronBlockState) {
+    static boolean isFull(BlockState cauldronBlockState) {
         return ((AbstractCauldronBlock) cauldronBlockState.getBlock()).isFull(cauldronBlockState);
     }
 
