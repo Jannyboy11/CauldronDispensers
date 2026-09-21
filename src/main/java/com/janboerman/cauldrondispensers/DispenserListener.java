@@ -12,9 +12,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -176,17 +173,6 @@ public class DispenserListener implements Listener {
     private static void dropItemInsideBlockLocation(Block block, ItemStack itemStack) {
         Location dropLocation = block.getLocation().add(0.5, 0.5, 0.5);
         block.getWorld().dropItemNaturally(dropLocation, itemStack);
-    }
-
-    //
-
-    @Deprecated(forRemoval = true)
-    private void markDispensedItemForRemoval(BlockDispenseEvent event, ItemStack dispensedItem) {
-        ItemMeta itemMeta = dispensedItem.getItemMeta();
-        PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
-        pdc.set(plugin.taggedForRemovalKey, PersistentDataType.BOOLEAN, true);
-        dispensedItem.setItemMeta(itemMeta);
-        event.setItem(dispensedItem);
     }
 
     // utils
