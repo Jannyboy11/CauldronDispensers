@@ -38,6 +38,8 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         BlockState adjacentBlockState = level.getBlockState(adjacentBlockPos);
 
         if (adjacentBlockState.is(Blocks.WATER_CAULDRON) && isFull(adjacentBlockState)) {
+            // TODO fire BlockDispenseEvent
+
             setEmptyCauldron(level, adjacentBlockPos);
 
             ItemStack singleWaterBucket = emptyBucketItemStack.transmuteCopy(CauldronDispensers.WATER_BUCKET, 1);
@@ -45,6 +47,8 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         }
 
         else if (adjacentBlockState.is(Blocks.LAVA_CAULDRON) && isFull(adjacentBlockState)) {
+            // TODO fire BlockDispenseEvent
+
             setEmptyCauldron(level, adjacentBlockPos);
 
             ItemStack singleLavaBucket = emptyBucketItemStack.transmuteCopy(CauldronDispensers.LAVA_BUCKET, 1);
@@ -52,6 +56,8 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         }
 
         else if (adjacentBlockState.is(Blocks.POWDER_SNOW_CAULDRON) && isFull(adjacentBlockState)) {
+            // TODO fire BlockDispenseEvent
+
             setEmptyCauldron(level, adjacentBlockPos);
 
             ItemStack singlePowderSnowBucket = emptyBucketItemStack.transmuteCopy(CauldronDispensers.POWDER_SNOW_BUCKET, 1);

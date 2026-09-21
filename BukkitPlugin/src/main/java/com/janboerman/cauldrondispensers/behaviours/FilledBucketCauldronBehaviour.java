@@ -16,14 +16,12 @@ import net.minecraft.world.level.gameevent.GameEvent;
 
 import java.util.Objects;
 
-public class FilledBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
+public abstract class FilledBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
 
     private final DispenseItemBehavior delegate;
-    private final Block replacementCauldronBlock;
 
-    public FilledBucketCauldronBehaviour(DispenseItemBehavior delegate, Block replacementCauldronBlock) {
+    public FilledBucketCauldronBehaviour(DispenseItemBehavior delegate) {
         this.delegate = Objects.requireNonNull(delegate);
-        this.replacementCauldronBlock = Objects.requireNonNull(replacementCauldronBlock);
     }
 
     /**
@@ -39,16 +37,24 @@ public class FilledBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         BlockPos hopefullyCauldronBlockPos = blockSource.pos().relative(direction);
         BlockState adjacentBlockState = level.getBlockState(hopefullyCauldronBlockPos);
 
-        if (!adjacentBlockState.is(Blocks.CAULDRON)) {
-            return delegate.dispense(blockSource, waterBucketItemStack);
+        if (adjacentBlockState.is(Blocks.CAULDRON) || isSpecificCauldron(adjacentBlockState)) {
+
+            // TODO fire BlockDispenseItemEvent? probably yes.
+            // TODO what about CauldronLevelChangeEvent (only if the level was already 1 or 2, and now changed to 3)
+
+            level.setBlockAndUpdate(hopefullyCauldronBlockPos, getFullCauldronState());
+            level.gameEvent(null, GameEvent.BLOCK_CHANGE, hopefullyCauldronBlockPos);
+
+            ItemStack singleEmptyBucket = waterBucketItemStack.transmuteCopy(CauldronDispensers.EMPTY_BUCKET, 1);
+            return consumeWithRemainder(blockSource, waterBucketItemStack, singleEmptyBucket);
         }
 
-        // TODO fire BlockDispenseItemEvent? probably yes.
-
-        level.setBlockAndUpdate(hopefullyCauldronBlockPos, replacementCauldronBlock.defaultBlockState());
-        level.gameEvent(null, GameEvent.BLOCK_CHANGE, hopefullyCauldronBlockPos);
-
-        ItemStack singleEmptyBucket = waterBucketItemStack.transmuteCopy(CauldronDispensers.EMPTY_BUCKET, 1);
-        return consumeWithRemainder(blockSource, waterBucketItemStack, singleEmptyBucket);
+        else {
+            return delegate.dispense(blockSource, waterBucketItemStack);
+        }
     }
+
+    protected abstract BlockState getFullCauldronState();
+
+    protected abstract boolean isSpecificCauldron(BlockState blockState);
 }

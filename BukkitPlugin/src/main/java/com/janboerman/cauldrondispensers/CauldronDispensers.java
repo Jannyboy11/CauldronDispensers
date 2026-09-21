@@ -1,12 +1,13 @@
 package com.janboerman.cauldrondispensers;
 
-import com.janboerman.cauldrondispensers.behaviours.EmptyBucketCauldronBehaviour;
-import com.janboerman.cauldrondispensers.behaviours.FilledBucketCauldronBehaviour;
+import com.janboerman.cauldrondispensers.behaviours.*;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
@@ -31,9 +32,9 @@ public class CauldronDispensers extends JavaPlugin {
         this.originalPowderSnowBucketBehaviour = getDispenseItemBehaviour(POWDER_SNOW_BUCKET);
 
         setDispenseItemBehaviour(Items.BUCKET, new EmptyBucketCauldronBehaviour(originalEmptyBucketBehaviour));
-        setDispenseItemBehaviour(Items.WATER_BUCKET, new FilledBucketCauldronBehaviour(originalWaterBucketBehaviour, Blocks.WATER_CAULDRON));
-        setDispenseItemBehaviour(Items.LAVA_BUCKET, new FilledBucketCauldronBehaviour(originalLavaBucketBehaviour, Blocks.LAVA_CAULDRON));
-        setDispenseItemBehaviour(Items.POWDER_SNOW_BUCKET, new FilledBucketCauldronBehaviour(originalPowderSnowBucketBehaviour, Blocks.POWDER_SNOW_CAULDRON));
+        setDispenseItemBehaviour(Items.WATER_BUCKET, new WaterBucketCauldronBehaviour(originalWaterBucketBehaviour));
+        setDispenseItemBehaviour(Items.LAVA_BUCKET, new LavaBucketCauldronBehaviour(originalLavaBucketBehaviour));
+        setDispenseItemBehaviour(Items.POWDER_SNOW_BUCKET, new PowderSnowBucketCauldronBehaviour(originalPowderSnowBucketBehaviour));
     }
 
     @Override
