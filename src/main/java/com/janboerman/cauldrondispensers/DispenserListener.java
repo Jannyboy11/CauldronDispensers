@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Map;
 
+@Deprecated(forRemoval = true)
 public class DispenserListener implements Listener {
 
     private final CauldronDispensers plugin;
