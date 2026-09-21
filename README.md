@@ -1,5 +1,7 @@
 # DispenserCauldrons
 
+![Logo](https://github.com/Jannyboy11/CauldronDispensers/blob/master/img/icon.png?raw=true)
+
 Allows dispensers to fill cauldrons with water, lava or powder snow.
 
 The behaviour mimics bucket behaviour when interacted by a player; already filled cauldrons contents can be overwritten.
