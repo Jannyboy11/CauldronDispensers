@@ -47,6 +47,7 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         BlockPos adjacentBlockPos = blockSource.pos().relative(direction);
         BlockState adjacentBlockState = level.getBlockState(adjacentBlockPos);
 
+        // Water
         if (adjacentBlockState.is(Blocks.WATER_CAULDRON) && isFull(adjacentBlockState)) {
             // Dispenser update:
             ItemStack result = switch (callDispenseEvent(level, blockSource, emptyBucketItemStack)) {
@@ -66,6 +67,7 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
             return result;
         }
 
+        // Lava
         else if (adjacentBlockState.is(Blocks.LAVA_CAULDRON) && isFull(adjacentBlockState)) {
             // Dispenser update:
             ItemStack result = switch (callDispenseEvent(level, blockSource, emptyBucketItemStack)) {
@@ -85,6 +87,7 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
             return result;
         }
 
+        // Powder Snow
         else if (adjacentBlockState.is(Blocks.POWDER_SNOW_CAULDRON) && isFull(adjacentBlockState)) {
             // Dispenser update:
             ItemStack result = switch (callDispenseEvent(level, blockSource, emptyBucketItemStack)) {
@@ -104,6 +107,7 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
             return result;
         }
 
+        // Fallback
         else {
             return delegate.dispense(blockSource, emptyBucketItemStack);
         }
