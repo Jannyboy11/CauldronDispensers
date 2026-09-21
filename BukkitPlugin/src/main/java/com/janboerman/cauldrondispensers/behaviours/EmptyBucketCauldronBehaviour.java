@@ -24,6 +24,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Objects;
 
+import static com.janboerman.cauldrondispensers.Compat.BLOCK_STATE_UTIL;
 import static com.janboerman.cauldrondispensers.Compat.ITEM_UTIL;
 
 public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
@@ -171,7 +172,7 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
 
         CraftBlock cauldronCraftBlock = CraftBlock.at(level, cauldronBlockPos);
         CraftBlockState craftBlockState = CraftBlockStates.getBlockState(level, cauldronBlockPos);
-        craftBlockState.setData(newState);
+        BLOCK_STATE_UTIL.setHandle(craftBlockState, newState);
 
         CauldronLevelChangeEvent event = new CauldronLevelChangeEvent(cauldronCraftBlock, null, CauldronLevelChangeEvent.ChangeReason.UNKNOWN, craftBlockState);
         Bukkit.getPluginManager().callEvent(event);
