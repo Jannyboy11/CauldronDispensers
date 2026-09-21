@@ -75,7 +75,7 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         }
     }
 
-    static boolean isFull(BlockState cauldronBlockState) {
+    private static boolean isFull(BlockState cauldronBlockState) {
         return ((AbstractCauldronBlock) cauldronBlockState.getBlock()).isFull(cauldronBlockState);
     }
 

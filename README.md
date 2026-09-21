@@ -12,3 +12,7 @@ Requirements: [JDK 25](https://jdk.java.net/archive/), [Apache Maven](https://ma
 - CraftBukkit: `java -jar BuildTools.jar --rev 26.3 --compile craftbukkit`
 - Paper: `mvn ca.bkaw:paper-nms-maven-plugin:init --pl :PaperCompat`
 
+2. Then compile CauldronDispensers:
+- `mvn clean package`
+
+

@@ -11,6 +11,10 @@
 
     <artifactId>BukkitPlugin</artifactId>
 
+    <build>
+        <finalName>CauldronDispensers</finalName>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
@@ -19,6 +23,7 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Other maven subprojects: -->
         <dependency>
             <groupId>com.janboerman.cauldrondispensers</groupId>
             <artifactId>Compat</artifactId>

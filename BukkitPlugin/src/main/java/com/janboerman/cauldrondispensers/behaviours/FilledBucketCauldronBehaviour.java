@@ -26,7 +26,6 @@ import org.bukkit.util.Vector;
 import java.util.Objects;
 
 import static com.janboerman.cauldrondispensers.Compat.ITEM_UTIL;
-import static com.janboerman.cauldrondispensers.behaviours.EmptyBucketCauldronBehaviour.isFull;
 
 public abstract class FilledBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
 
@@ -50,55 +49,60 @@ public abstract class FilledBucketCauldronBehaviour extends DefaultDispenseItemB
         BlockState adjacentBlockState = level.getBlockState(hopefullyCauldronBlockPos);
 
         if (adjacentBlockState.is(BlockTags.CAULDRONS)) {
-            // BlockDispenseEvent:
-            CraftBlock dispenserCraftBlock = CraftBlock.at(level, blockSource.pos());
-            CraftItemStack craftItemStack = ITEM_UTIL.asCraftMirror(filledBucketItemStack);
-            // Weird velocity, but copied from standard water/lava bucket dispenser behaviour.
-            Vector velocity = new Vector(hopefullyCauldronBlockPos.getX(), hopefullyCauldronBlockPos.getY(), hopefullyCauldronBlockPos.getZ());
+            blockDispenseEvent:
+            {
+                CraftBlock dispenserCraftBlock = CraftBlock.at(level, blockSource.pos());
+                CraftItemStack craftItemStack = ITEM_UTIL.asCraftMirror(filledBucketItemStack);
+                // Weird velocity, but copied from standard water/lava bucket dispenser behaviour.
+                Vector velocity = new Vector(hopefullyCauldronBlockPos.getX(), hopefullyCauldronBlockPos.getY(), hopefullyCauldronBlockPos.getZ());
 
-            BlockDispenseEvent dispenseEvent = new BlockDispenseEvent(dispenserCraftBlock, craftItemStack, velocity);
-            // Ignore CraftBukkit's DispenserBlock#eventFired, since it is never set to true.
-            Bukkit.getPluginManager().callEvent(dispenseEvent);
+                BlockDispenseEvent dispenseEvent = new BlockDispenseEvent(dispenserCraftBlock, craftItemStack, velocity);
+                Bukkit.getPluginManager().callEvent(dispenseEvent); // ignore DispenserBlock.eventFired because it doesn't exist on Paper
 
-            if (dispenseEvent.isCancelled()) {
-                return filledBucketItemStack;
-            }
-
-            if (!dispenseEvent.getItem().equals(craftItemStack)) {
-                // Chain to handler for new item
-                ItemStack eventStack = ITEM_UTIL.asNmsCopy(dispenseEvent.getItem());
-                DispenseItemBehavior dispenseitembehavior = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
-                if (dispenseitembehavior != DispenseItemBehavior.NOOP && dispenseitembehavior != this) {
-                    dispenseitembehavior.dispense(blockSource, eventStack);
+                if (dispenseEvent.isCancelled()) {
                     return filledBucketItemStack;
+                }
+
+                if (!dispenseEvent.getItem().equals(craftItemStack)) {
+                    // Chain to handler for new item
+                    ItemStack eventStack = ITEM_UTIL.asNmsCopy(dispenseEvent.getItem());
+                    DispenseItemBehavior dispenseitembehavior = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
+                    if (dispenseitembehavior != DispenseItemBehavior.NOOP && dispenseitembehavior != this) {
+                        dispenseitembehavior.dispense(blockSource, eventStack);
+                        return filledBucketItemStack;
+                    }
                 }
             }
 
-            // CauldronLevelChangeEvent:
-            BlockState newState = getFullCauldronState();
-            if (!isFull(adjacentBlockState)) {
+            // Actual dispense logic:
+            ItemStack singleEmptyBucket = filledBucketItemStack.transmuteCopy(CauldronDispensers.EMPTY_BUCKET, 1);
+            ItemStack resultDispensedItem = consumeWithRemainder(blockSource, filledBucketItemStack, singleEmptyBucket);
+
+            cauldronLevelChangeEvent:
+            {
+                BlockState newState = getFullCauldronState();
+
                 CraftBlock cauldronCraftBlock = CraftBlock.at(level, hopefullyCauldronBlockPos);
                 CraftBlockState craftBlockState = CraftBlockStates.getBlockState(level, hopefullyCauldronBlockPos);
                 craftBlockState.setData(newState);
-
-                CauldronLevelChangeEvent cauldronEvent = new CauldronLevelChangeEvent(cauldronCraftBlock, null, CauldronLevelChangeEvent.ChangeReason.BUCKET_EMPTY, craftBlockState);
+                CauldronLevelChangeEvent cauldronEvent = new CauldronLevelChangeEvent(cauldronCraftBlock, null, CauldronLevelChangeEvent.ChangeReason.UNKNOWN, craftBlockState);
                 Bukkit.getPluginManager().callEvent(cauldronEvent);
-
-                if (!cauldronEvent.isCancelled()) {
-                    int newLevel = cauldronEvent.getNewLevel();
-                    if (newState.getBlock() instanceof LayeredCauldronBlock && !Integer.valueOf(newLevel).equals(newState.getValue(LayeredCauldronBlock.LEVEL))) {
-                        newState = getCauldronState(newLevel);
-                    }
-
-                    // Cauldron logic:
-                    level.setBlockAndUpdate(hopefullyCauldronBlockPos, newState);
-                    level.gameEvent(null, GameEvent.BLOCK_CHANGE, hopefullyCauldronBlockPos);
+                if (cauldronEvent.isCancelled()) {
+                    break cauldronLevelChangeEvent;
                 }
+                int newLevel = cauldronEvent.getNewLevel();
+                if (newState.getBlock() instanceof LayeredCauldronBlock && !Integer.valueOf(newLevel).equals(newState.getValue(LayeredCauldronBlock.LEVEL))) {
+                    newState = getCauldronState(newLevel);
+                }
+
+                // Actual cauldron logic:
+                level.setBlockAndUpdate(hopefullyCauldronBlockPos, newState);
+                level.gameEvent(null, GameEvent.BLOCK_CHANGE, hopefullyCauldronBlockPos);
             }
 
-            // Dispense logic:
-            ItemStack singleEmptyBucket = filledBucketItemStack.transmuteCopy(CauldronDispensers.EMPTY_BUCKET, 1);
-            return consumeWithRemainder(blockSource, filledBucketItemStack, singleEmptyBucket);
+
+            // Finally, return.
+            return resultDispensedItem;
         }
 
         else {

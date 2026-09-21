@@ -24,13 +24,6 @@ public class WaterBucketCauldronBehaviour extends FilledBucketCauldronBehaviour 
     }
 
     @Override
-    protected CraftBlockState toBukkitBlockState(BlockState fullCauldronState) {
-        CraftBlockState newState = CraftBlockStates.getBlockState(level, blockpos);
-        newState.setData(fullCauldronState);
-        return null;
-    }
-
-    @Override
     protected BlockState getCauldronState(int level) {
         return Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, level);
     }

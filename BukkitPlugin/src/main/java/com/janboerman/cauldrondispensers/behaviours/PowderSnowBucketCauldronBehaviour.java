@@ -20,4 +20,9 @@ public class PowderSnowBucketCauldronBehaviour extends FilledBucketCauldronBehav
     protected boolean isSpecificCauldron(BlockState blockState) {
         return blockState.is(Blocks.POWDER_SNOW_CAULDRON);
     }
+
+    @Override
+    protected BlockState getCauldronState(int level) {
+        return Blocks.POWDER_SNOW_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, level);
+    }
 }
