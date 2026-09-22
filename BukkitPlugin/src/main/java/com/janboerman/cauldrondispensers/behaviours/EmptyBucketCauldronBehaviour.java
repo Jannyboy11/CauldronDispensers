@@ -52,11 +52,14 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         if (adjacentBlockState.is(Blocks.WATER_CAULDRON) && isFull(adjacentBlockState)) {
             // Dispenser update:
             ItemStack result = switch (callDispenseEvent(level, blockSource, emptyBucketItemStack)) {
-                case CANCELLED, ALLOWED_ITEM_CHANGED:
+                case DispenseEventResult.Cancelled _, DispenseEventResult.AlreadyHandled _:
                     yield null;
-                case ALLOWED_ITEM_UNCHANGED:
+                case DispenseEventResult.AllowedItemUnchanged _:
                     ItemStack singleWaterBucket = emptyBucketItemStack.transmuteCopy(CauldronDispensers.WATER_BUCKET, 1);
                     yield consumeWithRemainder(blockSource, emptyBucketItemStack, singleWaterBucket);
+                case DispenseEventResult.AllowedItemChanged(ItemStack changedStack):
+                    singleWaterBucket = changedStack.transmuteCopy(CauldronDispensers.WATER_BUCKET, 1);
+                    yield consumeWithRemainder(blockSource, changedStack, singleWaterBucket);
             };
             if (result == null) {
                 return emptyBucketItemStack;
@@ -133,7 +136,7 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
 
     // Event stuff
 
-    private static DispenseEventResult callDispenseEvent(ServerLevel serverLevel, BlockSource dispenserBlock, ItemStack filledBucketStack) {
+    private DispenseEventResult callDispenseEvent(ServerLevel serverLevel, BlockSource dispenserBlock, ItemStack filledBucketStack) {
         CraftBlock dispenserCraftBlock = CraftBlock.at(serverLevel, dispenserBlock.pos());
         CraftItemStack craftItemStack = ITEM_UTIL.asCraftMirror(filledBucketStack);
         Vector velocity = new Vector(0, 0, 0);
@@ -142,29 +145,31 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {
-            return DispenseEventResult.CANCELLED;
+            return DispenseEventResult.Cancelled.INSTANCE;
         }
 
         else if (!event.getItem().equals(craftItemStack)) {
             // Chain to handler for new item
             ItemStack eventStack = ITEM_UTIL.asNmsCopy(event.getItem());
-            DispenseItemBehavior dispenseItemBehaviour = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
-            if (dispenseItemBehaviour != null) {
-                // Note: dispenseItemBehaviour might be 'this' instance, in which case #execute was recursively called - that is fine.
+            DispenseItemBehavior dispenseItemBehaviour = DispenserBlock.DISPENSER_REGISTRY.getOrDefault(eventStack.getItem(), DispenseItemBehavior.NOOP);
+            if (dispenseItemBehaviour != this) {
                 dispenseItemBehaviour.dispense(dispenserBlock, eventStack);
+                return DispenseEventResult.AlreadyHandled.INSTANCE;
+            } else {
+                return new DispenseEventResult.AllowedItemChanged(eventStack);
             }
-            return DispenseEventResult.ALLOWED_ITEM_CHANGED;
         }
 
         else {
-            return DispenseEventResult.ALLOWED_ITEM_UNCHANGED;
+            return DispenseEventResult.AllowedItemUnchanged.INSTANCE;
         }
     }
 
-    private enum DispenseEventResult {
-        ALLOWED_ITEM_UNCHANGED,
-        ALLOWED_ITEM_CHANGED,
-        CANCELLED;
+    private sealed interface DispenseEventResult {
+        enum AllowedItemUnchanged implements DispenseEventResult { INSTANCE; }
+        record AllowedItemChanged(ItemStack changedStack) implements DispenseEventResult { }
+        enum Cancelled implements DispenseEventResult { INSTANCE; }
+        enum AlreadyHandled implements DispenseEventResult { INSTANCE; }
     }
 
     private static CauldronEventResult callCauldronEvent(ServerLevel level, BlockPos cauldronBlockPos) {
