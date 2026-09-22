@@ -15,6 +15,8 @@ public class CauldronDispensers extends JavaPlugin {
     public static final Item LAVA_BUCKET = Items.LAVA_BUCKET;
     public static final Item POWDER_SNOW_BUCKET = Items.POWDER_SNOW_BUCKET;
 
+    private final Metrics metrics = new Metrics(this);
+
     private DispenseItemBehavior originalEmptyBucketBehaviour;
     private DispenseItemBehavior originalWaterBucketBehaviour;
     private DispenseItemBehavior originalLavaBucketBehaviour;
@@ -31,10 +33,14 @@ public class CauldronDispensers extends JavaPlugin {
         setDispenseItemBehaviour(Items.WATER_BUCKET, new WaterBucketCauldronBehaviour(originalWaterBucketBehaviour));
         setDispenseItemBehaviour(Items.LAVA_BUCKET, new LavaBucketCauldronBehaviour(originalLavaBucketBehaviour));
         setDispenseItemBehaviour(Items.POWDER_SNOW_BUCKET, new PowderSnowBucketCauldronBehaviour(originalPowderSnowBucketBehaviour));
+
+        metrics.ready();
     }
 
     @Override
     public void onDisable() {
+        metrics.shutdown();
+
         setDispenseItemBehaviour(Items.BUCKET, originalEmptyBucketBehaviour);
         setDispenseItemBehaviour(Items.WATER_BUCKET, originalWaterBucketBehaviour);
         setDispenseItemBehaviour(Items.LAVA_BUCKET, originalLavaBucketBehaviour);

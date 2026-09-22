@@ -10,10 +10,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.block.CraftBlockState;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 
-public class Compat {
+public final class Compat {
 
     public static final ItemUtil ITEM_UTIL = getItemUtil();
     public static final BlockStateUtil BLOCK_STATE_UTIL = getBlockStateUtil();
+
+    private Compat() {
+    }
 
     private static ItemUtil getItemUtil() {
         try {
