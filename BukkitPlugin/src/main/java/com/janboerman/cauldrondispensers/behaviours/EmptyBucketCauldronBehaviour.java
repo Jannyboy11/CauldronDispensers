@@ -75,11 +75,14 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         else if (adjacentBlockState.is(Blocks.LAVA_CAULDRON) && isFull(adjacentBlockState)) {
             // Dispenser update:
             ItemStack result = switch (callDispenseEvent(level, blockSource, emptyBucketItemStack)) {
-                case CANCELLED, ALLOWED_ITEM_CHANGED:
+                case DispenseEventResult.Cancelled _, DispenseEventResult.AlreadyHandled _:
                     yield null;
-                case ALLOWED_ITEM_UNCHANGED:
+                case DispenseEventResult.AllowedItemUnchanged _:
                     ItemStack singleLavaBucket = emptyBucketItemStack.transmuteCopy(CauldronDispensers.LAVA_BUCKET, 1);
                     yield consumeWithRemainder(blockSource, emptyBucketItemStack, singleLavaBucket);
+                case DispenseEventResult.AllowedItemChanged(ItemStack changedStack):
+                    singleLavaBucket = changedStack.transmuteCopy(CauldronDispensers.LAVA_BUCKET, 1);
+                    yield consumeWithRemainder(blockSource, changedStack, singleLavaBucket);
             };
             if (result == null) {
                 return emptyBucketItemStack;
@@ -95,11 +98,14 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
         else if (adjacentBlockState.is(Blocks.POWDER_SNOW_CAULDRON) && isFull(adjacentBlockState)) {
             // Dispenser update:
             ItemStack result = switch (callDispenseEvent(level, blockSource, emptyBucketItemStack)) {
-                case CANCELLED, ALLOWED_ITEM_CHANGED:
+                case DispenseEventResult.Cancelled _, DispenseEventResult.AlreadyHandled _:
                     yield null;
-                case ALLOWED_ITEM_UNCHANGED:
+                case DispenseEventResult.AllowedItemUnchanged _:
                     ItemStack singlePowderSnowBucket = emptyBucketItemStack.transmuteCopy(CauldronDispensers.POWDER_SNOW_BUCKET, 1);
                     yield consumeWithRemainder(blockSource, emptyBucketItemStack, singlePowderSnowBucket);
+                case DispenseEventResult.AllowedItemChanged(ItemStack changedStack):
+                    singlePowderSnowBucket = changedStack.transmuteCopy(CauldronDispensers.POWDER_SNOW_BUCKET, 1);
+                    yield consumeWithRemainder(blockSource, changedStack, singlePowderSnowBucket);
             };
             if (result == null) {
                 return emptyBucketItemStack;
