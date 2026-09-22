@@ -64,11 +64,14 @@ public abstract class FilledBucketCauldronBehaviour extends DefaultDispenseItemB
                 if (!dispenseEvent.getItem().equals(craftItemStack)) {
                     // Chain to handler for new item
                     ItemStack eventStack = ITEM_UTIL.asNmsCopy(dispenseEvent.getItem());
-                    DispenseItemBehavior dispenseitembehavior = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
-                    if (dispenseitembehavior != this) {
-                        dispenseitembehavior.dispense(blockSource, eventStack);
+                    DispenseItemBehavior dispenseItemBehaviour = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
+                    if (dispenseItemBehaviour != this) {
+                        dispenseItemBehaviour.dispense(blockSource, eventStack);
+                        return filledBucketItemStack;
+                    } else {
+                        // Delegate dispense behaviour is 'this'. Let's continue!
+                        filledBucketItemStack = eventStack;
                     }
-                    return filledBucketItemStack;
                 }
             }
 
