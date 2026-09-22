@@ -7,6 +7,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.DispenserBlock;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.nio.file.Path;
+
 /** The plugin's main class */
 public class CauldronDispensers extends JavaPlugin {
 
@@ -55,4 +57,7 @@ public class CauldronDispensers extends JavaPlugin {
         DispenserBlock.registerBehavior(item, behaviour);
     }
 
+    Path getJarFilePath() {
+        return getFile().toPath();
+    }
 }

@@ -3,8 +3,11 @@ package com.janboerman.cauldrondispensers;
 import dev.faststats.bukkit.BukkitContext;
 import dev.faststats.data.Metric;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.logging.Level;
 
 final class Metrics {
 
@@ -16,12 +19,18 @@ final class Metrics {
 
     Metrics(CauldronDispensers plugin) {
         Instant start = Instant.now();
+        Instant installationTime = getInstallationTime(plugin);
 
         bukkitContext = new BukkitContext.Factory(plugin, FASTSTATS_API_TOKEN)
-                .metrics(factory -> factory
-                        .addMetric(Metric.number("major_java_version", () -> MAJOR_JAVA_VERSION))
-                        .addMetric(Metric.number("uptime_days", () -> getDaysSince(start)))
-                        .create())
+                .metrics(factory -> {
+                    factory
+                            .addMetric(Metric.number("major_java_version", () -> MAJOR_JAVA_VERSION))
+                            .addMetric(Metric.number("uptime_days", () -> getDaysSince(start)));
+                    if (installationTime != null) {
+                        factory.addMetric(Metric.number("installation_age_days", () -> getDaysSince(installationTime)));
+                    }
+                    return factory.create();
+                })
                 .create();
     }
 
@@ -49,5 +58,14 @@ final class Metrics {
     private static int getDaysSince(Instant from) {
         Instant now = Instant.now();
         return (int) Duration.between(from, now).toDays();
+    }
+
+    private static Instant getInstallationTime(CauldronDispensers plugin) {
+        try {
+            return Files.getLastModifiedTime(plugin.getJarFilePath()).toInstant();
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.WARNING, "Could not obtain plugin last modified time.", e);
+            return null;
+        }
     }
 }
