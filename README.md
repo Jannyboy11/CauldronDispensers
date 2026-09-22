@@ -6,6 +6,9 @@ Allows dispensers to fill cauldrons with water, lava or powder snow.
 
 The behaviour mimics bucket behaviour when interacted by a player; already filled cauldrons contents can be overwritten.
 
+
+Do you like this plugin? Then please leave a review on [MC-Foundry](https://mc-foundry.com/p/cauldrondispensers)!
+
 ### Compiling
 
 Requirements: [JDK 25](https://jdk.java.net/archive/), [Apache Maven](https://maven.apache.org/), [BuildTools](https://www.spigotmc.org/wiki/buildtools/).
