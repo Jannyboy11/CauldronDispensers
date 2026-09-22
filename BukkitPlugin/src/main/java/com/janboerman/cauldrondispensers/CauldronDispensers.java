@@ -7,7 +7,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.DispenserBlock;
 import org.bukkit.plugin.java.JavaPlugin;
 
-
 /** The plugin's main class */
 public class CauldronDispensers extends JavaPlugin {
 

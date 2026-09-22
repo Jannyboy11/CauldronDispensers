@@ -2,7 +2,6 @@ package com.janboerman.cauldrondispensers.behaviours;
 
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class LavaBucketCauldronBehaviour extends FilledBucketCauldronBehaviour {

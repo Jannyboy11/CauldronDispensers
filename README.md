@@ -1,4 +1,4 @@
-# DispenserCauldrons
+# CauldronDispensers
 
 <img src="https://github.com/Jannyboy11/CauldronDispensers/blob/master/img/icon.png?raw=true" alt="drawing" width="150"/>
 

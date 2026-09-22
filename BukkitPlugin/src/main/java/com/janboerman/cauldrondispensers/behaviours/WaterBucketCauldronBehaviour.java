@@ -4,8 +4,6 @@ import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import org.bukkit.craftbukkit.block.CraftBlockState;
-import org.bukkit.craftbukkit.block.CraftBlockStates;
 
 public class WaterBucketCauldronBehaviour extends FilledBucketCauldronBehaviour {
 
