@@ -43,7 +43,7 @@
                     <preprationGoals>clean verify</preprationGoals>
                     <scmCommentPrefix>Maven Release Plugin:</scmCommentPrefix>
                     <scmReleaseCommitComment>@{prefix} Release @{releaseLabel}&#x1f389;!</scmReleaseCommitComment>
-                    <scmDevelopmentCommitComment>@{prefix} Bump version.</scmDevelopmentCommitComment>
+                    <scmDevelopmentCommitComment>@{prefix} Bump version. [skip ci]</scmDevelopmentCommitComment>
                     <scmRollbackCommitComment>@{prefix} Roll back.</scmRollbackCommitComment>
                 </configuration>
             </plugin>
