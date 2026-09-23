@@ -4,7 +4,7 @@
 
     <groupId>com.janboerman.cauldrondispensers</groupId>
     <artifactId>CauldronDispensers</artifactId>
-    <version>1.9</version>
+    <version>1.10-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -20,7 +20,7 @@
 
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/Jannyboy11/CauldronDispensers.git</developerConnection>
-        <tag>v1.9</tag>
+        <tag>v1.8</tag>
     </scm>
 
     <build>
