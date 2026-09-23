@@ -20,3 +20,7 @@ Requirements: [JDK 25](https://jdk.java.net/archive/), [Apache Maven](https://ma
 - `mvn clean package`
 
 3. Find the CauldronDispensers jar in `./BukkitPlugin/target`.
+
+### Releasing
+
+// TODO
