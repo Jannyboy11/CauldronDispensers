@@ -20,6 +20,11 @@
         <minecraft.version>26.3</minecraft.version>
     </properties>
 
+    <scm>
+        <developerConnection>scm:git:ssh://git@github.com/Jannyboy11/InvSee-plus-plus.git</developerConnection>
+        <tag>v1.3</tag>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
@@ -28,6 +33,20 @@
                 <version>3.16.0</version>
                 <configuration>
                     <release>25</release>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <tagNameFormat>v${project.version}</tagNameFormat>
+                    <preprationGoals>clean verify</preprationGoals>
+                    <scmCommentPrefix>Maven Release Plugin:</scmCommentPrefix>
+                    <scmReleaseCommitComment>@{prefix} Release @{releaseLabel}&#x1f389;!</scmReleaseCommitComment>
+                    <scmDevelopmentCommitComment>@{prefix} Bump version.</scmDevelopmentCommitComment>
+                    <scmRollbackCommitComment>@{prefix} Roll back.</scmRollbackCommitComment>
                 </configuration>
             </plugin>
         </plugins>
