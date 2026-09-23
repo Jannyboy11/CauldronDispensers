@@ -23,4 +23,8 @@ Requirements: [JDK 25](https://jdk.java.net/archive/), [Apache Maven](https://ma
 
 ### Releasing
 
-// TODO
+Run the following commands:
+
+- `mvn release:prepare`
+- `git push origin master --follow-tags`
+- `mvn release:clean`
