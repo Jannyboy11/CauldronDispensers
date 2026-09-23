@@ -33,6 +33,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag'
+    needs: build
 
     # required for action-gh-release@v3
     permissions:
