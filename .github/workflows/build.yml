@@ -42,8 +42,6 @@ jobs:
     steps:
       - name: Download CauldronDispensers
         uses: actions/download-artifact@v8
-        with:
-          name: CauldronDispensers
       - name: Create tagged release
         uses: softprops/action-gh-release@v3
         env:

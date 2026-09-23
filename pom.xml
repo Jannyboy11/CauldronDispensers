@@ -20,7 +20,7 @@
 
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/Jannyboy11/CauldronDispensers.git</developerConnection>
-        <tag>v1.3</tag>
+        <tag>v1.8</tag>
     </scm>
 
     <build>
