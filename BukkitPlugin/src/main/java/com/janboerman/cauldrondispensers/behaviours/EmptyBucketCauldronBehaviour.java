@@ -162,6 +162,7 @@ public class EmptyBucketCauldronBehaviour extends DefaultDispenseItemBehavior {
                 dispenseItemBehaviour.dispense(dispenserBlock, eventStack);
                 return DispenseEventResult.AlreadyHandled.INSTANCE;
             } else {
+                // Dispense behaviour is this, but with a changed item.
                 return new DispenseEventResult.AllowedItemChanged(eventStack);
             }
         }

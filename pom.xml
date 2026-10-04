@@ -16,6 +16,11 @@
 
     <properties>
         <minecraft.version>26.3</minecraft.version>
+
+        <!-- Maven Release Plugin properties -->
+        <maven.deploy.skip>releases</maven.deploy.skip>
+        <ignoreSnapshots>true</ignoreSnapshots>
+        <ignoreReleases>true</ignoreReleases>
     </properties>
 
     <scm>
