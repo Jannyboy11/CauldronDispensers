@@ -1,12 +1,17 @@
 # CauldronDispensers
 
-<img src="https://github.com/Jannyboy11/CauldronDispensers/blob/master/img/icon.png?raw=true" alt="drawing" width="150"/>
+<img src="https://github.com/Jannyboy11/CauldronDispensers/blob/master/img/CauldronDispensers3.webp?raw=true" alt="drawing" width="150"/>
 
 Allows dispensers to fill cauldrons with water, lava or powder snow.
 
 The behaviour mimics bucket behaviour when interacted by a player; already filled cauldrons contents can be overwritten.
 
 Do you like this plugin? Then please leave a review on [MC-Foundry](https://mc-foundry.com/p/cauldrondispensers)!
+
+## Credits
+
+Special thanks to Icodak for creating the plugin's logo!
+You can find them on [SpigotMC](https://www.spigotmc.org/members/icodak.473813/) and on [Discord](https://discordapp.com/users/345308025331908619).
 
 ### Compiling
 
