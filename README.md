@@ -1,6 +1,6 @@
 # CauldronDispensers
 
-<img src="https://github.com/Jannyboy11/CauldronDispensers/blob/master/img/CauldronDispensers3.webp?raw=true" alt="drawing" width="150"/>
+<img src="https://github.com/Jannyboy11/CauldronDispensers/blob/master/img/CauldronDispensers4.webp?raw=true" alt="drawing" width="150"/>
 
 Allows dispensers to fill cauldrons with water, lava or powder snow.
 
